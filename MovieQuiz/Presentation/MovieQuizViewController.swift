@@ -72,7 +72,8 @@ final class MovieQuizViewController: UIViewController {
         QuizQuestion(
             image: "Vivarium",
             text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: false),
+            correctAnswer: false
+        ),
     ]
     
     // MARK: - Lifecycle
@@ -145,7 +146,7 @@ final class MovieQuizViewController: UIViewController {
             message: result.text,
             preferredStyle: .alert)
         
-        let actionRepeate = UIAlertAction(
+        let actionRepeat = UIAlertAction(
             title: result.buttonText,
             style: .default,
             handler: { _ in
@@ -156,7 +157,7 @@ final class MovieQuizViewController: UIViewController {
             }
         )
         
-        alert.addAction(actionRepeate)
+        alert.addAction(actionRepeat)
         
        present(alert, animated: true, completion: nil)
     }
