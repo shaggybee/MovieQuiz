@@ -48,6 +48,12 @@
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="AYO-Iu-WNf" secondAttribute="height" multiplier="2:3" id="bhA-uH-bDO"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="20"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Рейтинг этого фильма меньше, чем 5?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nrj-qt-JS5" userLabel="Question Label">
                                         <rect key="frame" x="0.0" y="624.5" width="374" height="99.5"/>
@@ -71,6 +77,9 @@
                                                         <integer key="value" value="15"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="noButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="S0n-CQ-Pqr"/>
+                                                </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zsl-vq-6re" userLabel="Yes Buton">
                                                 <rect key="frame" x="197" y="0.0" width="177" height="60"/>
@@ -85,6 +94,9 @@
                                                         <integer key="value" value="15"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="yesButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="8OD-PK-yvg"/>
+                                                </connections>
                                             </button>
                                         </subviews>
                                         <constraints>
@@ -103,6 +115,13 @@
                             <constraint firstItem="DZi-pK-Fzu" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" constant="-20" id="s1J-AX-h9u"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="counterLabel" destination="6af-Te-z4M" id="9Za-YY-QaP"/>
+                        <outlet property="imageView" destination="AYO-Iu-WNf" id="o36-Sb-huJ"/>
+                        <outlet property="noButton" destination="R6q-CZ-qZr" id="BBS-yl-3uO"/>
+                        <outlet property="textLabel" destination="nrj-qt-JS5" id="SsC-ez-irh"/>
+                        <outlet property="yesButton" destination="zsl-vq-6re" id="PIU-Nf-gAg"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
