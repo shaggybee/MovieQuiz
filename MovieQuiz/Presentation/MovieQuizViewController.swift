@@ -17,6 +17,8 @@ final class MovieQuizViewController: UIViewController {
     private let questionsAmount: Int = 10
     private var currentQuestion: QuizQuestion?
     
+    private lazy var alertPresenter: AlertPresenter = { AlertPresenter() }()
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +32,7 @@ final class MovieQuizViewController: UIViewController {
     
     // MARK: - IB Actions
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        guard let currentQuestion = currentQuestion else {
+        guard let currentQuestion else {
             return
         }
         
@@ -38,7 +40,7 @@ final class MovieQuizViewController: UIViewController {
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        guard let currentQuestion = currentQuestion else {
+        guard let currentQuestion else {
             return
         }
         
@@ -64,7 +66,7 @@ final class MovieQuizViewController: UIViewController {
         changeButtonsState(isEnabled: false)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             
             self.imageView.layer.borderWidth = 0
             self.imageView.layer.borderColor = .none
@@ -96,27 +98,20 @@ final class MovieQuizViewController: UIViewController {
     }
     
     private func show(quiz result: QuizResultsViewModel) {
-        let alert = UIAlertController(
+        let alertModel = AlertModel(
             title: result.title,
             message: result.text,
-            preferredStyle: .alert)
-        
-        let actionRepeat = UIAlertAction(
-            title: result.buttonText,
-            style: .default,
-            handler: { [weak self] _ in
-                guard let self = self else { return }
+            buttonText: result.buttonText,
+            completion: { [weak self] in
+                guard let self else { return }
                 
                 self.correctAnswers = 0
                 self.currentQuestionIndex = 0
                 
                 self.questionFactory?.requestNextQuestion()
-            }
-        )
+            })
         
-        alert.addAction(actionRepeat)
-        
-       present(alert, animated: true, completion: nil)
+        alertPresenter.show(in: self, model: alertModel)
     }
     
     private func changeButtonsState(isEnabled: Bool) {
@@ -129,7 +124,7 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
     
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question = question else {
+        guard let question else {
             return
         }
         
