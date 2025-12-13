@@ -7,7 +7,7 @@
 
 import Foundation
 
-class QuestionFactory: QuestionFactoryProtocol {
+final class QuestionFactory {
     
     // MARK: - Public Properties
     weak var delegate: QuestionFactoryDelegate?
@@ -56,8 +56,12 @@ class QuestionFactory: QuestionFactoryProtocol {
             correctAnswer: false
         ),
     ]
+}
+
+// MARK: - QuestionFactoryProtocol
+extension QuestionFactory: QuestionFactoryProtocol {
     
-    // MARK: - Public Methods
+    // MARK: - Public methods
     func requestNextQuestion() {
         guard let questionIndex = (0..<questions.count).randomElement() else {
             delegate?.didReceiveNextQuestion(question: nil)

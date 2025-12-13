@@ -17,7 +17,8 @@ final class MovieQuizViewController: UIViewController {
     private let questionsAmount: Int = 10
     private var currentQuestion: QuizQuestion?
     
-    private lazy var alertPresenter: AlertPresenter = { AlertPresenter() }()
+    private lazy var resultAlertPresenter: ResultAlertPresenter = { ResultAlertPresenter() }()
+    private lazy var statisticService: StatisticServiceProtocol = { StatisticService() }()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -78,17 +79,36 @@ final class MovieQuizViewController: UIViewController {
     
     private func showNextQuestionOrResults() {
       if currentQuestionIndex == questionsAmount - 1 {
-          let resultsViewModel = QuizResultsViewModel(
-              title: "Этот раунд окончен!",
-              text: "Ваш результат: \(correctAnswers)/\(questionsAmount)",
-              buttonText: "Сыграть ещё раз")
+          let gameResult = GameResult(
+            correct: correctAnswers,
+            total: questionsAmount,
+            date: Date())
           
-          show(quiz: resultsViewModel)
+          statisticService.store(result: gameResult)
+    
+          show(quiz: prepareQuizResults())
       } else {
         currentQuestionIndex += 1
           
         questionFactory?.requestNextQuestion()
       }
+    }
+    
+    private func prepareQuizResults() -> QuizResultsViewModel {
+        let totalAccuracyFormatted = String(format: "%.2f", statisticService.totalAccuracy)
+        let bestGame = statisticService.bestGame
+        
+        let text = """
+            Ваш результат: \(correctAnswers)/\(questionsAmount)
+            Количество сыгранных квизов: \(statisticService.gamesCount)
+            Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))
+            Средняя точность: \(totalAccuracyFormatted)%
+            """
+        
+        return QuizResultsViewModel(
+            title: "Этот раунд окончен!",
+            text: text,
+            buttonText: "Сыграть ещё раз")
     }
     
     private func show(quiz step: QuizStepViewModel) {
@@ -111,7 +131,7 @@ final class MovieQuizViewController: UIViewController {
                 self.questionFactory?.requestNextQuestion()
             })
         
-        alertPresenter.show(in: self, model: alertModel)
+        resultAlertPresenter.show(in: self, model: alertModel)
     }
     
     private func changeButtonsState(isEnabled: Bool) {
@@ -120,9 +140,8 @@ final class MovieQuizViewController: UIViewController {
     }
 }
 
+// MARK: - QuestionFactoryDelegate
 extension MovieQuizViewController: QuestionFactoryDelegate {
-    
-    // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question else {
             return
