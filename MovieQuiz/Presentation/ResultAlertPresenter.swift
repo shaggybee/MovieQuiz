@@ -26,6 +26,9 @@ final class ResultAlertPresenter {
         
         alert.addAction(action)
         
-        viewControllerToPresent.present(alert, animated: true, completion: nil)
+        viewControllerToPresent.present(
+            alert, 
+            animated: true, 
+            completion: nil)
     }
 }

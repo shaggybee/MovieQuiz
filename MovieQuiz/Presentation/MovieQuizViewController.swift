@@ -98,11 +98,16 @@ final class MovieQuizViewController: UIViewController {
         let totalAccuracyFormatted = String(format: "%.2f", statisticService.totalAccuracy)
         let bestGame = statisticService.bestGame
         
+        let resultText = "Ваш результат: \(correctAnswers)/\(questionsAmount)"
+        let gamesCountText = "Количество сыгранных квизов: \(statisticService.gamesCount)"
+        let recordText = "Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))"
+        let totalAccuracyText = "Средняя точность: \(totalAccuracyFormatted)%"
+        
         let text = """
-            Ваш результат: \(correctAnswers)/\(questionsAmount)
-            Количество сыгранных квизов: \(statisticService.gamesCount)
-            Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))
-            Средняя точность: \(totalAccuracyFormatted)%
+            \(resultText)
+            \(gamesCountText)
+            \(recordText)
+            \(totalAccuracyText)
             """
         
         return QuizResultsViewModel(
