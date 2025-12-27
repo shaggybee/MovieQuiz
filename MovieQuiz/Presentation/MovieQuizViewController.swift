@@ -173,7 +173,7 @@ final class MovieQuizViewController: UIViewController {
     private func configActivityIndicator() {
         activityIndicator.hidesWhenStopped = true
         activityIndicator.style = .large
-        activityIndicator.color = .orange
+        activityIndicator.color = .ypRed
     }
     
     private func loadQuizData() {

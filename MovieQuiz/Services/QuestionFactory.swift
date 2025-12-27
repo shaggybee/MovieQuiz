@@ -5,7 +5,7 @@
 //  Created by Kislov Vadim on 09.12.2025.
 //
 
-import Foundation
+import UIKit
 
 final class QuestionFactory {
     
@@ -39,7 +39,7 @@ extension QuestionFactory: QuestionFactoryProtocol {
             do {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
-                print("Failed to load image")
+                imageData = getFallbackImageData(for: movie)
             }
             
             let movieRating = Float(movie.rating) ?? 0
@@ -74,6 +74,36 @@ extension QuestionFactory: QuestionFactoryProtocol {
                     self.delegate?.didFailToLoadData(with: error)
                 }
             }
+        }
+    }
+    
+    // MARK: - Private methods
+    private func getFallbackImageData(for movie: MostPopularMovie) -> Data {
+        let title = "\(movie.title)" as NSString
+        let imageSize = CGSize(width: 200, height: 300)
+        let imageRenderer = UIGraphicsImageRenderer(size: imageSize)
+        
+        return imageRenderer.pngData { _ in
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .center
+            paragraphStyle.lineBreakMode = .byWordWrapping
+
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont(name: "YSDisplay-Bold", size: 16) ?? UIFont.boldSystemFont(ofSize: 16),
+                .foregroundColor: UIColor.ypBlack,
+                .paragraphStyle: paragraphStyle
+            ]
+            
+            let textSize = title.size(withAttributes: attributes)
+
+            let textRect = CGRect(
+                x: 0,
+                y: (imageSize.height - textSize.height) / 2,
+                width: imageSize.width,
+                height: imageSize.height
+            )
+
+            title.draw(in: textRect, withAttributes: attributes)
         }
     }
 }
