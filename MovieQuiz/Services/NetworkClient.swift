@@ -9,10 +9,12 @@ import Foundation
 
 struct NetworkClient {
 
+    // MARK: - Nested Types
     private enum NetworkError: Error {
         case codeError
     }
     
+    // MARK: - Public methods
     func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
         let request = URLRequest(url: url)
         
