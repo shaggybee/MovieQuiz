@@ -5,7 +5,7 @@
 //  Created by Kislov Vadim on 09.12.2025.
 //
 
-import Foundation
+import UIKit
 
 final class QuestionFactory {
     
@@ -13,49 +13,13 @@ final class QuestionFactory {
     weak var delegate: QuestionFactoryDelegate?
     
     // MARK: - Private Properties
-    private let questions: [QuizQuestion] = [
-        QuizQuestion(
-            image: "The Godfather",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "The Dark Knight",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "Kill Bill",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "The Avengers",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "Deadpool",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "The Green Knight",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: true),
-        QuizQuestion(
-            image: "Old",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: false),
-        QuizQuestion(
-            image: "The Ice Age Adventures of Buck Wild",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: false),
-        QuizQuestion(
-            image: "Tesla",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: false),
-        QuizQuestion(
-            image: "Vivarium",
-            text: "Рейтинг этого фильма больше чем 6?",
-            correctAnswer: false
-        ),
-    ]
+    private let moviesLoader: MoviesLoadingProtocol
+    private var movies: [MostPopularMovie] = []
+    
+    init(moviesLoader: MoviesLoadingProtocol, delegate: QuestionFactoryDelegate?) {
+        self.moviesLoader = moviesLoader
+        self.delegate = delegate
+    }
 }
 
 // MARK: - QuestionFactoryProtocol
@@ -63,12 +27,117 @@ extension QuestionFactory: QuestionFactoryProtocol {
     
     // MARK: - Public methods
     func requestNextQuestion() {
-        guard let questionIndex = (0..<questions.count).randomElement() else {
-            delegate?.didReceiveNextQuestion(question: nil)
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
             
-            return
+            let index = (0..<self.movies.count).randomElement() ?? 0
+
+            guard let movie = self.movies[safe: index] else { return }
+            
+            let question = getQuizQuestion(for: movie)
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+
+                self.delegate?.didReceiveNextQuestion(question: question)
+            }
+        }
+    }
+    
+    func loadData() {
+        moviesLoader.loadMovies { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                
+                switch result {
+                case .success(let mostPopularMovies):
+                    self.movies = mostPopularMovies.items
+                    self.delegate?.didLoadDataFromServer()
+                case .failure(let error):
+                    self.delegate?.didFailToLoadData(with: error)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Private methods
+    private func getQuizQuestion(for movie: MostPopularMovie) -> QuizQuestion {
+        var imageData = Data()
+       
+        do {
+            imageData = try Data(contentsOf: movie.resizedImageURL)
+        } catch {
+            imageData = getFallbackImageData(for: movie)
         }
         
-        delegate?.didReceiveNextQuestion(question: questions[safe: questionIndex])
+        let movieRating = Float(movie.rating) ?? 0
+
+        var correctAnswer = false
+        
+        var ratingWithDelta = Bool.random()
+            ? movieRating - Constants.ratingDelta
+            : movieRating + Constants.ratingDelta
+        
+        if ratingWithDelta == Constants.maxRating {
+            ratingWithDelta -= 2 * Constants.ratingDelta
+        }
+        
+        var questionText = "\(String(format: "%.1f", ratingWithDelta))?"
+
+        if Bool.random() {
+            correctAnswer = movieRating > ratingWithDelta
+            questionText = "\(Constants.Text.isRatingHigher) \(questionText)"
+        } else {
+            correctAnswer = movieRating < ratingWithDelta
+            questionText = "\(Constants.Text.isRatingLower) \(questionText)"
+        }
+        
+        return QuizQuestion(
+            image: imageData,
+            text: questionText,
+            correctAnswer: correctAnswer)
+    }
+    
+    private func getFallbackImageData(for movie: MostPopularMovie) -> Data {
+        let title = "\(movie.title)" as NSString
+        let imageSize = CGSize(width: 200, height: 300)
+        let imageRenderer = UIGraphicsImageRenderer(size: imageSize)
+        
+        return imageRenderer.pngData { _ in
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .center
+            paragraphStyle.lineBreakMode = .byWordWrapping
+
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont(name: UIFont.appBoldFontName, size: 16) ?? UIFont.boldSystemFont(ofSize: 16),
+                .foregroundColor: UIColor.ypBlack,
+                .paragraphStyle: paragraphStyle
+            ]
+            
+            let textSize = title.size(withAttributes: attributes)
+
+            let textRect = CGRect(
+                x: 0,
+                y: (imageSize.height - textSize.height) / 2,
+                width: imageSize.width,
+                height: imageSize.height
+            )
+
+            title.draw(in: textRect, withAttributes: attributes)
+        }
+    }
+}
+
+// MARK: - Constants
+private extension QuestionFactory {
+    enum Constants {
+        static let maxRating: Float = 10.0
+        static let higherRating: Float = 9.0
+        static let ratingDelta: Float = 0.3
+        
+        enum Text {
+            static let isRatingHigher = "Рейтинг этого фильма больше чем"
+            static let isRatingLower = "Рейтинг этого фильма меньше чем"
+        }
     }
 }
