@@ -34,27 +34,10 @@ extension QuestionFactory: QuestionFactoryProtocol {
 
             guard let movie = self.movies[safe: index] else { return }
             
-            var imageData = Data()
-           
-            do {
-                imageData = try Data(contentsOf: movie.resizedImageURL)
-            } catch {
-                imageData = getFallbackImageData(for: movie)
-            }
-            
-            let movieRating = Float(movie.rating) ?? 0
-            let randomRatingForQuestion = Int.random(in: 7..<10)
-            
-            let text = "Рейтинг этого фильма больше чем \(randomRatingForQuestion)?"
-            let correctAnswer = movieRating > Float(randomRatingForQuestion)
-            
-            let question = QuizQuestion(
-                image: imageData,
-                text: text,
-                correctAnswer: correctAnswer)
+            let question = getQuizQuestion(for: movie)
             
             DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 self.delegate?.didReceiveNextQuestion(question: question)
             }
@@ -78,6 +61,43 @@ extension QuestionFactory: QuestionFactoryProtocol {
     }
     
     // MARK: - Private methods
+    private func getQuizQuestion(for movie: MostPopularMovie) -> QuizQuestion {
+        var imageData = Data()
+       
+        do {
+            imageData = try Data(contentsOf: movie.resizedImageURL)
+        } catch {
+            imageData = getFallbackImageData(for: movie)
+        }
+        
+        let movieRating = Float(movie.rating) ?? 0
+
+        var correctAnswer = false
+        
+        var ratingWithDelta = Bool.random()
+            ? movieRating - Constants.ratingDelta
+            : movieRating + Constants.ratingDelta
+        
+        if ratingWithDelta == Constants.maxRating {
+            ratingWithDelta -= 2 * Constants.ratingDelta
+        }
+        
+        var questionText = "\(String(format: "%.1f", ratingWithDelta))?"
+
+        if Bool.random() {
+            correctAnswer = movieRating > ratingWithDelta
+            questionText = "\(Constants.Text.isRatingHigher) \(questionText)"
+        } else {
+            correctAnswer = movieRating < ratingWithDelta
+            questionText = "\(Constants.Text.isRatingLower) \(questionText)"
+        }
+        
+        return QuizQuestion(
+            image: imageData,
+            text: questionText,
+            correctAnswer: correctAnswer)
+    }
+    
     private func getFallbackImageData(for movie: MostPopularMovie) -> Data {
         let title = "\(movie.title)" as NSString
         let imageSize = CGSize(width: 200, height: 300)
@@ -104,6 +124,20 @@ extension QuestionFactory: QuestionFactoryProtocol {
             )
 
             title.draw(in: textRect, withAttributes: attributes)
+        }
+    }
+}
+
+// MARK: - Constants
+private extension QuestionFactory {
+    enum Constants {
+        static let maxRating: Float = 10.0
+        static let higherRating: Float = 9.0
+        static let ratingDelta: Float = 0.3
+        
+        enum Text {
+            static let isRatingHigher = "Рейтинг этого фильма больше чем"
+            static let isRatingLower = "Рейтинг этого фильма меньше чем"
         }
     }
 }
