@@ -109,7 +109,7 @@ extension QuestionFactory: QuestionFactoryProtocol {
             paragraphStyle.lineBreakMode = .byWordWrapping
 
             let attributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont(name: "YSDisplay-Bold", size: 16) ?? UIFont.boldSystemFont(ofSize: 16),
+                .font: UIFont(name: UIFont.appBoldFontName, size: 16) ?? UIFont.boldSystemFont(ofSize: 16),
                 .foregroundColor: UIColor.ypBlack,
                 .paragraphStyle: paragraphStyle
             ]
