@@ -10,7 +10,11 @@ import Foundation
 struct MoviesLoader {
     
     // MARK: - Private Properties
-    private let networkClient = NetworkClient()
+    private let networkClient: NetworkRoutingProtocol
+    
+    init(networkClient: NetworkRoutingProtocol = NetworkClient()) {
+        self.networkClient = networkClient
+    }
     
     private var mostPopularMoviesUrl: URL {
         guard let url = URL(string: Constants.moviesUrlString) else {

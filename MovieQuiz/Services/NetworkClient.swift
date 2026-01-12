@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NetworkClient {
+struct NetworkClient: NetworkRoutingProtocol {
 
     // MARK: - Nested Types
     private enum NetworkError: Error {

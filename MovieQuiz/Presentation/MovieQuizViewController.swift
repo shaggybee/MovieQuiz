@@ -125,6 +125,7 @@ final class MovieQuizViewController: UIViewController {
             title: result.title,
             message: result.text,
             buttonText: result.buttonText,
+            accessibilityIdentifier: "resultAlert",
             completion: { [weak self] in
                 guard let self else { return }
                 
