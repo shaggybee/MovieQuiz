@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		631C5ABA2F157C0E00541CE9 /* MovieQuizPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C5AB92F157C0E00541CE9 /* MovieQuizPresenter.swift */; };
 		6337BA792F0C4EEB005BFE30 /* NetworkRoutingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6337BA782F0C4EE1005BFE30 /* NetworkRoutingProtocol.swift */; };
 		634A33B82EE89D38009AB6C1 /* QuestionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634A33B72EE89D38009AB6C1 /* QuestionFactory.swift */; };
 		634A33BA2EE8A29D009AB6C1 /* QuizQuestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634A33B92EE8A29D009AB6C1 /* QuizQuestion.swift */; };
@@ -56,6 +57,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		631C5AB92F157C0E00541CE9 /* MovieQuizPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieQuizPresenter.swift; sourceTree = "<group>"; };
 		6337BA6C2F0C44A0005BFE30 /* MovieQuizTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MovieQuizTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6337BA782F0C4EE1005BFE30 /* NetworkRoutingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRoutingProtocol.swift; sourceTree = "<group>"; };
 		634A33B72EE89D38009AB6C1 /* QuestionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionFactory.swift; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 				AD1ABAB52831907B00B3E448 /* MovieQuizViewController.swift */,
 				AD1ABAB72831907B00B3E448 /* Main.storyboard */,
 				634A33C52EE94FFA009AB6C1 /* ResultAlertPresenter.swift */,
+				631C5AB92F157C0E00541CE9 /* MovieQuizPresenter.swift */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -407,6 +410,7 @@
 				634A33C22EE8C34F009AB6C1 /* QuestionFactoryDelegate.swift in Sources */,
 				634A33BE2EE8A34A009AB6C1 /* QuizResultsViewModel.swift in Sources */,
 				634A33BC2EE8A330009AB6C1 /* QuizStepViewModel.swift in Sources */,
+				631C5ABA2F157C0E00541CE9 /* MovieQuizPresenter.swift in Sources */,
 				AD1ABAB62831907B00B3E448 /* MovieQuizViewController.swift in Sources */,
 				637822192EED437E00742E42 /* StatisticServiceProtocol.swift in Sources */,
 				634A33B82EE89D38009AB6C1 /* QuestionFactory.swift in Sources */,
