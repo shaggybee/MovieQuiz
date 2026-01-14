@@ -10,7 +10,7 @@ import UIKit
 final class MovieQuizPresenter {
     
     // MARK: - Private Properties
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     private let questionsAmount = 10
     private var isLastQuestion: Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -21,7 +21,7 @@ final class MovieQuizPresenter {
     private var questionFactory: QuestionFactoryProtocol?
     private lazy var statisticService: StatisticServiceProtocol = { StatisticService() }()
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
@@ -47,6 +47,13 @@ final class MovieQuizPresenter {
         questionFactory?.requestNextQuestion()
     }
     
+    func convert(model: QuizQuestion) -> QuizStepViewModel {
+        QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
+            question: model.text,
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
+    }
+    
     // MARK: - Private Methods
     private func didAnswer(isYes: Bool) {
         guard let currentQuestion else {
@@ -54,13 +61,6 @@ final class MovieQuizPresenter {
         }
         
         showAnswerResult(isCorrect: currentQuestion.correctAnswer == isYes)
-    }
-    
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
     
     private func showNextQuestionOrResults() {
