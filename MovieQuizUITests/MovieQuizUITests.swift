@@ -28,34 +28,100 @@ final class MovieQuizUITests: XCTestCase {
     }
 
     func testYesButton() throws {
-        sleep(3)
+        sleep(Constants.delay)
         
-        let firstPoster = app.images["Poster"]
+        let firstPoster = app.images[Constants.Identifiers.movieImage]
         let firstPosterImageData = firstPoster.screenshot().pngRepresentation
         
-        app.buttons["buttonYes"].tap()
+        app.buttons[Constants.Identifiers.buttonYes].tap()
         
-        sleep(3)
+        sleep(Constants.delay)
         
-        let secondPoster = app.images["Poster"]
+        let secondPoster = app.images[Constants.Identifiers.movieImage]
+        let secondPosterImageData = secondPoster.screenshot().pngRepresentation
+        
+        XCTAssertNotEqual(firstPosterImageData, secondPosterImageData)
+    }
+    
+    func testNoButton() throws {
+        sleep(Constants.delay)
+        
+        let firstPoster = app.images[Constants.Identifiers.movieImage]
+        let firstPosterImageData = firstPoster.screenshot().pngRepresentation
+        
+        app.buttons[Constants.Identifiers.buttonNo].tap()
+        
+        sleep(Constants.delay)
+        
+        let secondPoster = app.images[Constants.Identifiers.movieImage]
         let secondPosterImageData = secondPoster.screenshot().pngRepresentation
         
         XCTAssertNotEqual(firstPosterImageData, secondPosterImageData)
     }
     
     func testEndOfRound() throws {
-        sleep(3)
+        sleep(Constants.delay)
         
-        for _ in 1...10 {
-            app.buttons["buttonYes"].tap()
+        for _ in 1...Constants.countQuestions {
+            let buttonIdentifier = [Constants.Identifiers.buttonYes, Constants.Identifiers.buttonNo].randomElement()!
             
-            sleep(3)
+            app.buttons[buttonIdentifier].tap()
+            
+            sleep(Constants.delay)
         }
         
-        let alert = app.alerts["resultAlert"]
+        let alert = app.alerts[Constants.Identifiers.resultAlert]
         
-        XCTAssert(alert.exists)
-        XCTAssertTrue(alert.label == "Этот раунд окончен!")
-        XCTAssertTrue(alert.buttons.firstMatch.label == "Сыграть ещё раз")
+        XCTAssertTrue(alert.exists)
+        XCTAssertTrue(alert.label == Constants.Texts.alertTitle)
+        XCTAssertTrue(alert.buttons.firstMatch.label == Constants.Texts.alertButtonTitle)
+    }
+    
+    func testRestartRound() throws {
+        sleep(Constants.delay)
+        
+        for _ in 1...Constants.countQuestions {
+            let buttonIdentifier = [Constants.Identifiers.buttonYes, Constants.Identifiers.buttonNo].randomElement()!
+            
+            app.buttons[buttonIdentifier].tap()
+            
+            sleep(Constants.delay)
+        }
+        
+        let alert = app.alerts[Constants.Identifiers.resultAlert]
+        
+        XCTAssertTrue(alert.exists)
+        
+        alert.buttons.firstMatch.tap()
+        
+        sleep(Constants.delay)
+        
+        XCTAssertFalse(alert.exists)
+        
+        let questionCounterLabel = app.staticTexts[Constants.Identifiers.questionCounterLabel]
+        
+        XCTAssertEqual(questionCounterLabel.label, Constants.Texts.initQuestionCounterText)
+    }
+}
+
+// MARK: - Constants
+private extension MovieQuizUITests {
+    enum Constants {
+        static let delay: UInt32 = 3
+        static let countQuestions = 10
+        
+        enum Identifiers {
+            static let buttonYes = "buttonYes"
+            static let buttonNo = "buttonNo"
+            static let resultAlert = "resultAlert"
+            static let movieImage = "poster"
+            static let questionCounterLabel = "questionCounterLabel"
+        }
+        
+        enum Texts {
+            static let alertTitle = "Этот раунд окончен!"
+            static let alertButtonTitle = "Сыграть ещё раз"
+            static let initQuestionCounterText = "1/10"
+        }
     }
 }

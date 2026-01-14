@@ -13,17 +13,26 @@ final class MovieQuizPresenterTests: XCTestCase {
     func testPresenterConvertModel() throws {
         let viewControllerMock = MovieQuizViewControllerMock()
         let presenter = MovieQuizPresenter(viewController: viewControllerMock)
-        
-        let questionText = "some question"
+
         let question = QuizQuestion(
             image: Data(),
-            text: questionText,
+            text: Constants.Texts.questionText,
             correctAnswer: true)
         
         let viewModel = presenter.convert(model: question)
         
         XCTAssertNotNil(viewModel.image)
-        XCTAssertEqual(viewModel.question, questionText)
-        XCTAssertEqual(viewModel.questionNumber, "1/10")
+        XCTAssertEqual(viewModel.question, Constants.Texts.questionText)
+        XCTAssertEqual(viewModel.questionNumber, Constants.Texts.initQuestionCounterText)
+    }
+}
+
+// MARK: - Constants
+private extension MovieQuizPresenterTests {
+    enum Constants {
+        enum Texts {
+            static let questionText = "some question"
+            static let initQuestionCounterText = "1/10"
+        }
     }
 }
