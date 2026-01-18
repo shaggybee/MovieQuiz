@@ -28,86 +28,108 @@ final class MovieQuizUITests: XCTestCase {
     }
 
     func testYesButton() throws {
-        sleep(Constants.delay)
-        
         let firstPoster = app.images[Constants.Identifiers.movieImage]
+        
+        expectationExistenceState(for: firstPoster)
+        
         let firstPosterImageData = firstPoster.screenshot().pngRepresentation
         
         app.buttons[Constants.Identifiers.buttonYes].tap()
         
-        sleep(Constants.delay)
-        
         let secondPoster = app.images[Constants.Identifiers.movieImage]
+        
+        expectationExistenceState(for: secondPoster)
+        
         let secondPosterImageData = secondPoster.screenshot().pngRepresentation
         
         XCTAssertNotEqual(firstPosterImageData, secondPosterImageData)
     }
     
     func testNoButton() throws {
-        sleep(Constants.delay)
-        
         let firstPoster = app.images[Constants.Identifiers.movieImage]
+        
+        expectationExistenceState(for: firstPoster)
+        
         let firstPosterImageData = firstPoster.screenshot().pngRepresentation
         
         app.buttons[Constants.Identifiers.buttonNo].tap()
         
-        sleep(Constants.delay)
-        
         let secondPoster = app.images[Constants.Identifiers.movieImage]
+        
+        expectationExistenceState(for: secondPoster)
+        
         let secondPosterImageData = secondPoster.screenshot().pngRepresentation
         
         XCTAssertNotEqual(firstPosterImageData, secondPosterImageData)
     }
     
     func testEndOfRound() throws {
-        sleep(Constants.delay)
-        
-        for _ in 1...Constants.countQuestions {
+        for questionindex in 1...Constants.countQuestions {
+            let questionCounterLabel = app.staticTexts["\(questionindex)/\(Constants.countQuestions)"]
+            
+            expectationExistenceState(for: questionCounterLabel)
+            
             let buttonIdentifier = [Constants.Identifiers.buttonYes, Constants.Identifiers.buttonNo].randomElement()!
+            let button = app.buttons[buttonIdentifier]
             
-            app.buttons[buttonIdentifier].tap()
+            expectationExistenceState(for: button)
             
-            sleep(Constants.delay)
+            button.tap()
         }
         
         let alert = app.alerts[Constants.Identifiers.resultAlert]
         
-        XCTAssertTrue(alert.exists)
+        expectationExistenceState(for: alert)
+
         XCTAssertTrue(alert.label == Constants.Texts.alertTitle)
         XCTAssertTrue(alert.buttons.firstMatch.label == Constants.Texts.alertButtonTitle)
     }
     
     func testRestartRound() throws {
-        sleep(Constants.delay)
-        
-        for _ in 1...Constants.countQuestions {
+        for questionindex in 1...Constants.countQuestions {
+            let questionCounterLabel = app.staticTexts["\(questionindex)/\(Constants.countQuestions)"]
+            
+            expectationExistenceState(for: questionCounterLabel)
+            
             let buttonIdentifier = [Constants.Identifiers.buttonYes, Constants.Identifiers.buttonNo].randomElement()!
+            let button = app.buttons[buttonIdentifier]
             
-            app.buttons[buttonIdentifier].tap()
+            expectationExistenceState(for: button)
             
-            sleep(Constants.delay)
+            button.tap()
         }
         
         let alert = app.alerts[Constants.Identifiers.resultAlert]
         
-        XCTAssertTrue(alert.exists)
+        expectationExistenceState(for: alert)
         
         alert.buttons.firstMatch.tap()
         
-        sleep(Constants.delay)
+        expectationExistenceState(for: alert, isExists: false)
         
-        XCTAssertFalse(alert.exists)
+        let questionCounterLabel = app.staticTexts[Constants.Texts.initQuestionCounterText]
         
-        let questionCounterLabel = app.staticTexts[Constants.Identifiers.questionCounterLabel]
+        expectationExistenceState(for: questionCounterLabel)
+    }
+
+    private func expectationExistenceState(
+        for element: XCUIElement,
+        isExists: Bool = true
+    ) {
+        let predicate = NSPredicate(format: "exists == \(isExists)")
         
-        XCTAssertEqual(questionCounterLabel.label, Constants.Texts.initQuestionCounterText)
+        expectation(
+            for: predicate,
+            evaluatedWith: element)
+        
+        waitForExpectations(timeout: Constants.delay)
     }
 }
 
 // MARK: - Constants
 private extension MovieQuizUITests {
     enum Constants {
-        static let delay: UInt32 = 3
+        static let delay: Double = 3
         static let countQuestions = 10
         
         enum Identifiers {
